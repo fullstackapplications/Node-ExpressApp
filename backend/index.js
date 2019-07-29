@@ -4,7 +4,7 @@ const express = require('express');
 
 const app = express();
 
-//injects middleware
+//injects middleware, called for every request
 app.use( (req, res, next) => {
     res.setHeader('x-server-date', new Date().toString() );
     return next();
@@ -13,6 +13,17 @@ app.use( (req, res, next) => {
 
 app.get('/', (req, res, next) => {
     return res.send('Hello this is a web server!');
+});
+
+app.get('/throw', (req, res, next) => {
+    throw new Error('Something is wrong');
+});
+
+app.get('/next', (req, res, next) => {
+    setTimeout( () => {
+        next( new Error('Something is wrong') );
+    },1000)
+    // next( new Error('Something is wrong') );
 });
 
 app.get('/time', (req, res, next) => {
