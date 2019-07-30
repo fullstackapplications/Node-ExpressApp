@@ -21,8 +21,8 @@ html
             .notfound
                 .notfound-404
                     h1 :(
-                h2 404 - Page not found
-                p
-                    | The page you are looking for might have been removed had its name changed or is temporarily unavailable.
-                a(href='#') home page
+                h2=status
+                p=message
+                if(error)
+                    pre=error.stack
         // This templates was made by Colorlib (https://colorlib.com)

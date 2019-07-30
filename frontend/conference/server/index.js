@@ -1,7 +1,7 @@
 const express  = require('express');
 const routes = require('./routes');
 const path = require('path');
-
+const createError = require('http-errors');
 
 FgBlack = "\x1b[30m";
 FgRed = "\x1b[31m";
@@ -35,8 +35,27 @@ app.get('./favicon.ico', (req, res, next) => {
 
 // injects middleware into location
 app.use('/', routes());
+
+
+app.use( (req, res, next) => {
+    return next(createError(404, 'File Not Found'));
+});
+
+app.use( (err, req, res, next) => {
+    res.locals.message = err.message;   //makes error message available in the template
+    const status = err.status || 500;   // sets error status code
+    res.locals.status = status;
+    res.locals.error = res.app.get('env') === 'development' ? err : {};
+    res.status(status);
+    return res.render('error');
+});
+
+
 // tells you to use files found in public folder
 app.use(express.static('public'));
+
+
+
 //starts the server a port mentioned
 app.listen(3000, () => {
 
