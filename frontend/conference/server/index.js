@@ -2,6 +2,8 @@ const express  = require('express');
 const createError = require('http-errors');
 const path = require('path');
 const routes = require('./routes');
+const configs = require('./config/');
+
 
 FgBlack = "\x1b[30m";
 FgRed = "\x1b[31m";
@@ -15,6 +17,8 @@ FgWhite = "\x1b[37m";
 
 
 const app = express();
+const config = configs[app.get('env')];     // get the current environment by default it's production
+
 
 //use pug as the view engine
 app.set('view engine', 'pug');
@@ -26,6 +30,11 @@ if(app.get('env') === 'development')
 }
 //returns second argument for first argument
 app.set('views', path.join(__dirname, './views'));
+app.locals.title = config.sitename;                 //sets title of site from /config/index.js
+// app.use( (req, res, next) => {
+//     res.locals.rendertime = new Date();
+//     return next();
+// });
 
 
 
@@ -59,7 +68,7 @@ app.use( (err, req, res, next) => {
 //starts the server a port mentioned
 app.listen(3000, () => {
 
-    console.log(FgBlue, 'We\'re listening on port 3000 baby! Everything is 200 ok!');
+    console.log(FgCyan, 'We\'re listening on port 3000 baby! Everything is 200 ok!');
 });
 
 
