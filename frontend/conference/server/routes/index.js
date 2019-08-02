@@ -18,9 +18,9 @@ module.exports = (param) => {
         }); // loads views/index.pug
     });
 
-    router.use('/speakers', speakersRoute());
+    router.use('/speakers', speakersRoute(param));
 
-    router.use('/feedback', feedbackRoute());
+    router.use('/feedback', feedbackRoute(param));
 
     return router;
 };
