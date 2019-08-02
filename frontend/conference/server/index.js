@@ -1,8 +1,9 @@
-const express  = require('express');
+const express = require('express');
 const createError = require('http-errors');
 const path = require('path');
 const routes = require('./routes');
 const configs = require('./config/');
+const SpeakerService = require('./services/SpeakerService');
 
 
 FgBlack = "\x1b[30m";
@@ -15,9 +16,9 @@ FgCyan = "\x1b[36m";
 FgWhite = "\x1b[37m";
 
 
-
 const app = express();
-const config = configs[app.get('env')];     // get the current environment by default it's production
+const config = configs[app.get('env')];     // get the current environment by default it's development
+const speakerService = new SpeakerService(config.data.speakers);
 
 
 //use pug as the view engine
@@ -37,24 +38,44 @@ app.locals.title = config.sitename;                 //sets title of site from /c
 // });
 
 
-
 // tells you to ignore this file
-app.get('/favicon.ico', (req, res, next) => {
+app.get('/favicon.ico', (req, res, next) =>
+{
     return res.sendStatus(204);
 });
 
+app.use(async(req, res, next) =>
+{
+    try
+    {
+        const names = await speakerService.getNames();
+        console.log(names);
+        res.locals.speakerNames = names;
+        return next();
+        // const data = await speakerService.getData();
+        // console.log(data);
+    }
+    catch(err)
+    {
+        next(err);
+    }
+});
+
 // injects middleware into location
-app.use('/', routes());
+app.use('/', routes({
+    speakerService,
+}));
 
 // tells you to use files found in public folder
 app.use(express.static('public'));
 
-app.use((req, res, next) => {
+app.use((req, res, next) =>
+{
     return next(createError(404, 'File not found'));
-    // next(); // for some reason above chokes everything.
 });
 
-app.use( (err, req, res, next) => {
+app.use((err, req, res, next) =>
+{
     res.locals.message = err.message;   //makes error message available in the template
     const status = err.status || 500;   // sets error status code
     res.locals.status = status;
@@ -64,13 +85,12 @@ app.use( (err, req, res, next) => {
 });
 
 
-
 //starts the server a port mentioned
-app.listen(3000, () => {
+app.listen(3000, () =>
+{
 
     console.log(FgCyan, 'We\'re listening on port 3000 baby! Everything is 200 ok!');
 });
-
 
 
 module.exports = app;
