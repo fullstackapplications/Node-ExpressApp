@@ -2,10 +2,15 @@ const express = require('express');
 const router = express.Router();
 
 
-module.exports = () => {
-    router.get('/', (req, res, next) => {
+module.exports = (param) => {
+
+    const { speakerService } = param;
+
+    router.get('/', async(req, res, next) => {
+        const speakersList = await speakerService.getList();
         return res.render('speakers',{
             page: 'All Speakers',
+            speakersList,
         }); //loads speakers in views folder
     });
 
