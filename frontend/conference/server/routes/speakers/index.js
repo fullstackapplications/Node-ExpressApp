@@ -33,11 +33,31 @@ module.exports = (param) =>
 
     });
 
-    router.get('/:name', (req, res, next) =>
+    router.get('/:name', async(req, res, next) =>
     {
-        return res.render('speakers/detail', {
-            page: req.params.name,
-        }); //loads speakers detail in views folder
+        try
+        {
+            const promises = [];
+            promises.push(speakerService.getSpeaker(req.params.name));
+            promises.push(speakerService.getArtworkForSpeaker(req.params.name));
+            const results = await Promise.all(promises);
+
+            if(!results[0])
+            {
+                return next();
+            }
+
+            return res.render('speakers/detail', {
+                page: req.params.name,
+                speaker: results[0],
+                artWork: results[1],
+            }); //loads speakers detail in views folder
+        }
+        catch(error)
+        {
+            return next(error);
+        }
+
     });
 
     return router;
