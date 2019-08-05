@@ -1,60 +1,51 @@
 const express = require('express');
 const router = express.Router();
+const bodyParser = require('body-parser');
 
+module.exports = (param) => {
 
-module.exports = (param) =>
-{
+    // create application/x-www-form-urlencoded parser
+    const urlencodedParser = bodyParser.urlencoded({ extended: true });
+    const { feedbackService } = param;
 
-    const {speakerService} = param;
-
-    router.get('/', async(req, res, next) =>
-    {
-        // const speakersList = await speakerService.getList();
-
-        try
-        {
-            const promises = [];
-
-            promises.push(speakerService.getList());
-            promises.push(speakerService.getAllArtwork());
-
-            const results = await Promise.all(promises);
-
-            return res.render('speakers', {
-                page: 'All Speakers',
-                speakersList: results[0],
-                artWork: results[1],
-            }); //loads speakers in views folder
-        }
-        catch(error)
-        {
+    router.get('/', async (req, res, next) => {
+        // return res.send('Feedback');
+        try {
+            const feedbacklist = await feedbackService.getList();
+            return res.render('feedback', {
+                page: 'Feedback',
+                feedbacklist,
+                success: req.query.success,
+            });
+        } catch(error) {
             return error;
         }
 
     });
 
-    router.get('/:name', async(req, res, next) =>
-    {
-        try
-        {
-            const promises = [];
-            promises.push(speakerService.getSpeaker(req.params.name));
-            promises.push(speakerService.getArtworkForSpeaker(req.params.name));
-            const results = await Promise.all(promises);
+    router.post('/', urlencodedParser, async(req, res, next) => {
 
-            if(!results[0])
-            {
-                return next();
+        try {
+            console.log(req.body);
+            const fbName = req.body.fbName.trim();
+            const fbTitle = req.body.fbTitle.trim();
+            const fbMessage = req.body.fbMessage.trim();
+            const feedbacklist = await feedbackService.getList();
+
+            if(!fbName || !fbTitle || !fbMessage){
+                return res.render('feedback', {
+                    page: 'Feedback',
+                    error: true,
+                    fbName,
+                    fbTitle,
+                    fbMessage,
+                    feedbacklist
+                })
             }
 
-            return res.render('speakers/detail', {
-                page: req.params.name,
-                speaker: results[0],
-                artWork: results[1],
-            }); //loads speakers detail in views folder
-        }
-        catch(error)
-        {
+            // return res.send(`Form sent!`);
+            return res.redirect('/feedback?success=true');
+        } catch(error){
             return next(error);
         }
 
