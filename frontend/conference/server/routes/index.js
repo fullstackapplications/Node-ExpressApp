@@ -3,19 +3,38 @@ const router = express.Router();
 const speakersRoute = require('./speakers');
 const feedbackRoute = require('./feedback');
 
-module.exports = (param) => {
+module.exports = (param) =>
+{
 
-    const { speakerService } = param;
+    const {speakerService} = param;
 
-    router.get('/', async (req, res, next) => {
+    router.get('/', async(req, res, next) =>
+    {
 
-        const speakersList = await speakerService.getListShort();
+        // const speakersList = await speakerService.getListShort();
+        // const artWork = await speakerService.getAllArtwork();
 
-        // return res.send('Index');
-        return res.render('index', {
-            page: 'Home',
-            speakersList,
-        }); // loads views/index.pug
+        try
+        {
+            const promises = [];
+
+            promises.push(speakerService.getListShort());
+            promises.push(speakerService.getAllArtwork());
+
+            const results = await Promise.all(promises);
+
+            // return res.send('Index');
+            return res.render('index', {
+                page: 'Home',
+                speakersList: results[0],
+                artWork: results[1],
+            }); // loads views/index.pug
+        }
+        catch(error)
+        {
+            next(error);
+        }
+
     });
 
     router.use('/speakers', speakersRoute(param));
