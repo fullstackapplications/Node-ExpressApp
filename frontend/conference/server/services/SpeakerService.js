@@ -50,6 +50,18 @@ class SpeakerService
         })
     }
 
+    async getAllArtwork() {
+        const data = await this.getData();
+        const artwork = data.reduce( (accumulator, element)=>
+        {
+            if(element.artwork){
+                accumulator = [...accumulator, ...element.artwork];
+            }
+            return accumulator;
+        }, []);
+        return artwork;
+    }
+
     async getData()
     {
         const data = await readFile(this.datafile, 'utf8');
