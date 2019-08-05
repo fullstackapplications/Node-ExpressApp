@@ -1,6 +1,6 @@
 const fs = require('fs');
 const util = require('util');
-const speakers = require('../data/speakers');
+// const speakers = require('../data/speakers');
 
 const readFile = util.promisify(fs.readFile);
 
@@ -18,7 +18,8 @@ class SpeakerService
         {
             return []
         }
-        return data.map( (speaker) => {
+        return data.map((speaker) =>
+        {
             return {
                 name: speaker.name,
                 shortname: speaker.shortname,
@@ -26,10 +27,12 @@ class SpeakerService
         })
     };
 
-    async getListShort() {
+    async getListShort()
+    {
         const data = await this.getData();
 
-        return data.map( (speaker) => {
+        return data.map((speaker) =>
+        {
             return {
                 name: speaker.name,
                 shortname: speaker.shortname,
@@ -37,10 +40,13 @@ class SpeakerService
             };
         })
     }
-    async getList() {
+
+    async getList()
+    {
         const data = await this.getData();
 
-        return data.map( (speaker) => {
+        return data.map((speaker) =>
+        {
             return {
                 name: speaker.name,
                 shortname: speaker.shortname,
@@ -50,16 +56,51 @@ class SpeakerService
         })
     }
 
-    async getAllArtwork() {
+    async getAllArtwork()
+    {
         const data = await this.getData();
-        const artwork = data.reduce( (accumulator, element)=>
+        const artwork = data.reduce((accumulator, element) =>
         {
-            if(element.artwork){
+            if(element.artwork)
+            {
                 accumulator = [...accumulator, ...element.artwork];
             }
             return accumulator;
         }, []);
         return artwork;
+    }
+
+    async getSpeaker(shortname)
+    {
+        const data = await this.getData();
+        const speaker = data.find((speaker) =>
+        {
+            return speaker.shortname == shortname;
+        });
+        if(!speaker)
+        {
+            return null;
+        }
+        return {
+            title: speaker.title,
+            name: speaker.name,
+            shortname: speaker.shortname,
+            description: speaker.description,
+        }
+    }
+
+    async getArtworkForSpeaker(shortname)
+    {
+        const data = await this.getData();
+        const speaker = data.find((speaker) =>
+        {
+            return speaker.shortname === shortname;
+        });
+        if(!speaker || !speaker.artwork)
+        {
+            return null;
+        }
+        return speaker.artwork;
     }
 
     async getData()
