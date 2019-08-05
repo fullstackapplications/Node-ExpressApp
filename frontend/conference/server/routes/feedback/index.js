@@ -43,6 +43,7 @@ module.exports = (param) => {
                 })
             }
 
+            await feedbackService.addEntry(fbName, fbTitle, fbMessage);
             // return res.send(`Form sent!`);
             return res.redirect('/feedback?success=true');
         } catch(error){
