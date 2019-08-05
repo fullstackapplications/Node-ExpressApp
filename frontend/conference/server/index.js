@@ -4,6 +4,7 @@ const path = require('path');
 const routes = require('./routes');
 const configs = require('./config/');
 const SpeakerService = require('./services/SpeakerService');
+const FeedbackService = require('./services/FeedbackService');
 
 
 FgBlack = "\x1b[30m";
@@ -19,6 +20,8 @@ FgWhite = "\x1b[37m";
 const app = express();
 const config = configs[app.get('env')];     // get the current environment by default it's development
 const speakerService = new SpeakerService(config.data.speakers);
+const feedbackService = new FeedbackService(config.data.feedback);
+
 
 
 //use pug as the view engine
@@ -64,6 +67,7 @@ app.use(async(req, res, next) =>
 // injects middleware into location
 app.use('/', routes({
     speakerService,
+    feedbackService,
 }));
 
 // tells you to use files found in public folder
@@ -89,7 +93,7 @@ app.use((err, req, res, next) =>
 app.listen(3000, () =>
 {
 
-    console.log(FgCyan, 'We\'re listening on port 3000 baby! Everything is 200 ok!');
+    console.log(FgYellow, 'We\'re listening on port 3000 baby! Everything is 200 ok!');
 });
 
 
